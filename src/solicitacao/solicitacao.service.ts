@@ -3,18 +3,63 @@ import { Op } from 'sequelize';
 import { ParceiroSolicitacoes } from '../sequelize/models/parceiro-solicitacoes.model';
 import { CreateSolicitacaoDto } from './dto/create-solicitacao.dto';
 import { UpdateSolicitacaoDto } from './dto/update-solicitacao.dto';
+import { UserPayload } from 'src/auth/entities/UserPayload.entity';
 
 @Injectable()
 export class SolicitacaoService {
-  async create(createSolicitacaoDto: CreateSolicitacaoDto, user: any) {
+  async create(createSolicitacaoDto: CreateSolicitacaoDto, user: UserPayload) {
     console.log("🚀 ~ SolicitacaoService ~ create ~ user:", user)
     try {
+      if (user.api === 0) {
+        throw new HttpException({
+          error: true,
+          message: 'Voce não tem permissão para utilizar esse serviço',
+          status: 401,
+          total: 0,
+          pages: 0,
+          current_page: 0,
+          data: null
+        }, 401);
+      }
+      const valor = user.receber_do === 'Parceiro' ? 0 : createSolicitacaoDto.valor_venda;
+      const valor_custo = createSolicitacaoDto.tipo_cd === 'A1PF_12M' ? user.a1pf_12m : createSolicitacaoDto.tipo_cd === 'A3PF_36M' ? user.a3pf_36m : createSolicitacaoDto.tipo_cd === 'A1PJ_12M' ? user.a1pj_12m : createSolicitacaoDto.tipo_cd === 'A3PJ_36M' ? user.a3pj_36m : createSolicitacaoDto.tipo_cd === 'A3PF_12M' ? user.a3pf_12m : 0;
+      const valor_diferenca = user.receber_do === 'Parceiro' ? 0 : valor - valor_custo;
+      const history = `${new Date().toISOString().split('T')[0].split('-').reverse().join('-')}.${new Date().toLocaleTimeString('pt-BR', { hour12: false, timeZone: 'America/Sao_Paulo' })}-${user.nome}: Criou a solicitação via API \n`
+      
+      if (createSolicitacaoDto.tipo_cd === 'A1PJ_12M' || createSolicitacaoDto.tipo_cd === 'A3PJ_36M') {
+        if (!createSolicitacaoDto.cnpj) {
+          throw new HttpException({
+            error: true,
+            message: 'CNPJ é obrigatório, para esse tipo de certificado',
+            status: 401,
+            total: 0,
+            pages: 0,
+            current_page: 0,
+            data: null
+          }, 401);
+        }
+        if (!createSolicitacaoDto.razao_social) {
+          throw new HttpException({
+            error: true,
+            message: 'Razão Social é obrigatória, para esse tipo de certificado',
+            status: 401,
+            total: 0,
+            pages: 0,
+            current_page: 0,
+            data: null
+          }, 401);
+        }
+      }
       const create = await ParceiroSolicitacoes.create({
         ...createSolicitacaoDto,
         id_usuario: user.id,
         id_polo: user.id_polo,
-        valor_venda: user.api === 1 ? 0 : createSolicitacaoDto.valor_venda,
+        valor_custo: valor_custo,
+        valor_diferenca: valor_diferenca,
+        valor_venda: valor,
+        historico_acoes: history,
       });
+
       return {
         error: false,
         message: 'Solicitação criada com sucesso',
@@ -38,7 +83,7 @@ export class SolicitacaoService {
     }
   }
 
-  async findAll(user: any, query: {
+  async findAll(user: UserPayload, query: {
     id?: string
     nome?: string
     cpf?: string
@@ -47,6 +92,18 @@ export class SolicitacaoService {
     page?: number
   }) {
     try {
+      if (user.api === 0) {
+        throw new HttpException({
+          error: true,
+          message: 'Voce não tem permissão para utilizar esse serviço',
+          status: 401,
+          total: 0,
+          pages: 0,
+          current_page: 0,
+          data: null
+        }, 401);
+      }
+
       // Validação do tipo_cd
       if (query.tipo_cd && !['A1PF_12M', 'A3PF_36M', 'A1PJ_12M', 'A3PJ_36M', 'A3PF_12M'].includes(query.tipo_cd)) {
         throw new HttpException({
@@ -112,8 +169,20 @@ export class SolicitacaoService {
     }
   }
 
-  async findOne(id: number, user: any) {
+  async findOne(id: number, user: UserPayload) {
     try {
+      if (user.api === 0) {
+        throw new HttpException({
+          error: true,
+          message: 'Voce não tem permissão para utilizar esse serviço',
+          status: 401,
+          total: 0,
+          pages: 0,
+          current_page: 0,
+          data: null
+        }, 401);
+      }
+
       const solicitacao = await ParceiroSolicitacoes.findOne({
         where: {
           id,
@@ -158,8 +227,19 @@ export class SolicitacaoService {
     }
   }
 
-  async update(id: number, updateSolicitacaoDto: UpdateSolicitacaoDto, user: any) {
+  async update(id: number, updateSolicitacaoDto: UpdateSolicitacaoDto, user: UserPayload) {
     try {
+      if (user.api === 0) {
+        throw new HttpException({
+          error: true,
+          message: 'Voce não tem permissão para utilizar esse serviço',
+          status: 401,
+          total: 0,
+          pages: 0,
+          current_page: 0,
+          data: null
+        }, 401);
+      }
       const [affectedCount] = await ParceiroSolicitacoes.update(updateSolicitacaoDto, {
         where: {
           id,
@@ -208,8 +288,19 @@ export class SolicitacaoService {
     }
   }
 
-  async remove(id: number, user: any) {
+  async remove(id: number, user: UserPayload) {
     try {
+      if (user.api === 0) {
+        throw new HttpException({
+          error: true,
+          message: 'Voce não tem permissão para utilizar esse serviço',
+          status: 401,
+          total: 0,
+          pages: 0,
+          current_page: 0,
+          data: null
+        }, 401);
+      }
       // Soft delete: atualiza status para 'inativo' em vez de deletar
       const [affectedCount] = await ParceiroSolicitacoes.update({
         status: 'inativo',

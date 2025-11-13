@@ -21,7 +21,7 @@ export class ApiKeyGuard implements CanActivate {
     try {
       // Busca o usuário pela API key (usando o campo chavepix como API key)
       const usuario = await ParceiroUsuarios.findOne({
-        attributes: ['id','status','perfil','nome','cpf','telefone','email','tipo_parceria','a1pj_12m','a3pj_36m','a1pf_12m','a3pf_12m','a3pf_36m','receber_do','id_polo', 'api'],
+        attributes: ['id', 'status', 'perfil', 'nome', 'cpf', 'telefone', 'email', 'tipo_parceria', 'a1pj_12m', 'a3pj_36m', 'a1pf_12m', 'a3pf_12m', 'a3pf_36m', 'receber_do', 'id_polo', 'api', 'receber_do'],
         where: {
           id_polo: apiKey,
           status: 'ativo',

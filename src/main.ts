@@ -116,8 +116,8 @@ async function bootstrap() {
   await app.listen(PORT).then(() => {
     console.log(' ');
     console.log(' ');
-    console.log(`Server running on ${BaseUrl}/`);
-    console.log(`Api running on ${BaseUrl}/${ApiRoute}/`);
+    console.log(`Server running on ${BaseUrl}`);
+    console.log(`Api running on ${BaseUrl}/${ApiRoute}`);
     console.log(' ');
     console.log(' ');
   });
