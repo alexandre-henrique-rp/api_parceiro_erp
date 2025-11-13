@@ -27,9 +27,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('API Parceiro ERP')
+    .setTitle('API Sou Parceiro Interface')
     .setDescription(`
-# 📋 API Parceiro ERP - Documentação Completa
+# 📋 API Sou Parceiro Interface - Documentação Completa
 
 ## 🔐 Como Utilizar a API
 
