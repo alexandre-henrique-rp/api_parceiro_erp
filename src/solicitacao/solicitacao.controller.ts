@@ -25,6 +25,7 @@ export class SolicitacaoController {
       properties: {
         error: { type: 'boolean', example: false },
         message: { type: 'string', example: 'Solicitação criada com sucesso' },
+        video_conferencia:{type: 'string', example: 'Em analise | Aprovado | Rejeitado'},
         total: { type: 'number', example: 1 },
         pages: { type: 'number', example: 1 },
         current_page: { type: 'number', example: 1 },

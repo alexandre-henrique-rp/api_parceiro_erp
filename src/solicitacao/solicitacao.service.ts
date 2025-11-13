@@ -50,6 +50,8 @@ export class SolicitacaoService {
           }, 401);
         }
       }
+      const teste = await this.VideoConferencia(createSolicitacaoDto.cpf)
+      
       const create = await ParceiroSolicitacoes.create({
         ...createSolicitacaoDto,
         id_usuario: user.id,
@@ -63,6 +65,7 @@ export class SolicitacaoService {
       return {
         error: false,
         message: 'Solicitação criada com sucesso',
+        video_conferencia: !teste.data.videoconferencing_enabled ? 'Em analise': 'Aprovado',
         total: 1,
         pages: 1,
         current_page: 1,
@@ -340,6 +343,33 @@ export class SolicitacaoService {
           removed_at: new Date()
         }
       };
+    } catch (error) {
+      const retorno: { error: boolean; message: string; status: number, total: number, pages: number, current_page: number, data?: any } = {
+        error: true,
+        message: error instanceof Error ? error.message : 'Erro interno do servidor',
+        status: error.status || 500,
+        total: 0,
+        pages: 0,
+        current_page: 0,
+        data: null
+      };
+      throw new HttpException(retorno, error.status || 500);
+    }
+  }
+
+  async VideoConferencia(cpf: string) {
+    try {
+      const teste = await fetch('https://api.video.redebrasilrp.com.br', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cpf: cpf
+        })
+      })
+      const retorno = await teste.json()
+      return retorno
     } catch (error) {
       const retorno: { error: boolean; message: string; status: number, total: number, pages: number, current_page: number, data?: any } = {
         error: true,
