@@ -68,7 +68,12 @@ async function bootstrap() {
 - \`ativo\` - Solicitação ativa
 - \`inativo\` - Solicitação removida (soft delete)
 
-### 7. **Contatos e Suporte**
+### 7. **Status das Video Conferencia**
+- \`Em analise\` - analisando a possibilidade de video conferencia
+- \`Aprovado\` - Video conferencia aprovada
+- \`Rejeitado\` - Video conferencia rejeitada
+
+### 8. **Contatos e Suporte**
 - **📞 Suporte e Administração:** 
   - Telefone: [(16) 3289-7402](https://wa.me/551632897402)
   - Clique no número para abrir o WhatsApp

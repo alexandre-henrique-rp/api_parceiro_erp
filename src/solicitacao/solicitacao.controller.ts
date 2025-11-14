@@ -150,6 +150,7 @@ export class SolicitacaoController {
   findOne(@Param('id') id: string, @Req() req: any) {
     return this.solicitacaoService.findOne(+id, req.usuario);
   }
+  
 
   @Patch(':id')
   @UseGuards(ApiKeyGuard)
